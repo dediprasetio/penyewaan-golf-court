@@ -1,0 +1,8 @@
+Buat USER : 
+http://localhost/skripsi-penyewaan-golf-court/
+
+Buat Admin : 
+http://localhost/skripsi-penyewaan-golf-court/Admin
+
+Username Admin : superadmin
+Password admin : superadmin

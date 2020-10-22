@@ -1,0 +1,18 @@
+CREATE VIEW v_book AS 
+SELECT 
+	b.id_pesanan, b.kode_booking, 
+    b.id_member, b.tgl_booking, b.jam_main, b.nama_pemesan, b.alamat_pemesan, b.email as email_pemesan, b.no_telp as no_telp_pemesan, b.jenis_pelanggan,
+    b.id_lapangan, v.nama_lapangan, v.deskripsi, b.harga_lapangan,
+    b.id_fasilitas, f.diskon_member, 
+    b.id_paket_barang, pb.nama_paket as nama_paket_alat,
+    b.id_paket_mobil, pm.nama_paket as nama_paket_mobil,
+    b.total_harga, b.tgl_pesan, b.status_pesanan, b.tanggal_bayar, b.bukti_bayar, b.total_bayar, 
+    b.admin_cek, a.nama_admin, a.email, a.no_telp, a.level as level_admin,
+    b.keterangan_status, b.update_at
+FROM tbl_booking b 
+LEFT JOIN tbl_member m ON b.id_member = m.id_member
+INNER JOIN v_lapangan v ON b.id_lapangan = v.id_detail_lapangan
+LEFT JOIN tbl_fasilitas_member f ON b.id_fasilitas = f.id_fasilitas
+LEFT JOIN tbl_paket_sewa pb ON b.id_paket_barang = pb.id_paket
+LEFT JOIN tbl_paket_sewa pm ON b.id_paket_mobil = pm.id_paket
+LEFT JOIN tbl_admin a ON b.admin_cek = a.id_admin
