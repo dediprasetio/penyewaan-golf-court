@@ -57,15 +57,9 @@
 
                 <div class="card-toolbar">
                     <div class="dropdown dropdown-inline">
-                        <!-- <a href="<?= site_url('Admin/Member') ?>" class="btn btn-light btn-sm font-size-sm font-weight-bolder text-dark-75" data-toggle="tooltip" title="See More Members" data-placement="top" aria-haspopup="true" aria-expanded="false">See More</a> -->
+                        <input type="hidden" id="session_grafmember" name="session_grafmember" value="tahunan">
                         
-                        <!-- <div class="form-group">
-                            <select class="form-control" id="exampleFormControlSelect1">
-                            <option> Data Bulanan </option>
-                            <option> Data Tahunan </option>
-                            </select>
-                        </div> -->
-                        <button type="button" onclick="grafikMember()" class="btn btn-outline-secondary">Tahunan</button>
+                        <button type="button" onclick="grafikMember()" id="grafik_member" class="btn btn-outline-secondary">Tahunan</button>
                     </div>
                 </div>
             </div>
@@ -88,23 +82,18 @@
             <!--begin::Header-->
             <div class="card-header border-0">
                 <h3 class="card-title font-weight-bolder text-dark">Booking Lapangan</h3>
-                <!-- <div class="card-toolbar">
+                <div class="card-toolbar">
                     <div class="dropdown dropdown-inline">
-                        <a href="<?= site_url('Admin/Booking') ?>" class="btn btn-light btn-sm font-size-sm font-weight-bolder text-dark-75" data-toggle="tooltip" title="See More Book Hall" data-placement="top" aria-haspopup="true" aria-expanded="false">See More</a>
+                        <input type="hidden" id="session_grafbooking" name="session_grafbooking" value="tahunan">
+                        <button type="button" onclick="grafikBooking()" id="grafik_booking" class="btn btn-outline-secondary">Tahunan</button>
                     </div>
-                </div> -->
+                </div>
             </div>
             <!--end::Header-->
             <!--begin::Body-->
             <div class="card-body pt-2">
                 <div class="card-body pt-2">
                     <!--begin::Item-->
-                        <div class="form-group">
-                            <select class="form-control" id="exampleFormControlSelect1">
-                            <option> -- Data Tahunan -- </option>
-                            <option> -- Data Bulanan -- </option>
-                            </select>
-                        </div>
                         <div class="d-flex align-items-center mb-10">
                             <canvas id="myChartBooking"></canvas>
                         </div>
@@ -339,6 +328,8 @@
     <script src="<?= base_url('assets/') ?>dist/charjs_v280/Chart.js-2.8.0/dist/Chart.min.js"></script>
 <!-- End ChartJs Versi 2.7.2 -->
 <script>
+
+
 //deklarasi chartjs untuk membuat grafik 2d di id mychart 
 var ctx = document.getElementById('myChart').getContext('2d');
 
@@ -378,8 +369,18 @@ var myChart = new Chart(ctx, {
             ],
             //membuat warna pada bar chart
             backgroundColor: [
-                'rgba(<?php echo rand(1,255).",".rand(1,255).",".rand(1,255); ?>, 0.2)',
-                'rgba(<?php echo rand(1,255).",".rand(1,255).",".rand(1,255); ?>, 0.2)',
+                <?php
+                    $countMember = count($data['data']['result']['grafikMemberBulan']);
+                    $i = 1;
+                    foreach($data['data']['result']['grafikMemberBulan'] as $rows){
+                ?>  
+                    'rgba(<?php echo rand(1,255).",".rand(1,255).",".rand(1,255); ?>, 0.2)',
+                <?php
+                    }
+                ?>
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
             ],
             borderWidth: 1
         }]
@@ -398,29 +399,49 @@ var myChart = new Chart(ctx, {
 
 var ctx = document.getElementById('myChartBooking').getContext('2d');
 
-var myChart = new Chart(ctx, {
+var bookingChart = new Chart(ctx, {
     
     type: 'line',
     data: {
-        labels: ['Januar', 'Februari', 'Maret', 'April', 'Mei', 'Juni'],
+        labels: [<?php
+                $countBooking = count($data['data']['result']['grafikBookingBulan']);
+                $i = 1;
+                foreach($data['data']['result']['grafikBookingBulan'] as $rows){
+                    if($i < $countBooking){
+                        echo '"'.$rows['bulan_tahun'].'",';
+                    }else{
+                        echo $rows['bulan_tahun'];
+                    }
+                }
+            ?>],
         datasets: [{
             label: 'Grafik Booking',
-            data: [12, 19, 3, 5, 2, 3],
+            data: [
+                <?php
+                    $countBooking = count($data['data']['result']['grafikBookingBulan']);
+                    $i = 1;
+                    foreach($data['data']['result']['grafikBookingBulan'] as $rows){
+                        if($i < $countBooking){
+                            echo '"'.$rows['count_booking'].'",';
+                        }else{
+                            echo $rows['count_booking'];
+                        }
+                    }
+                ?>
+            ],
             backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
+                <?php
+                    $countMember = count($data['data']['result']['grafikBookingBulan']);
+                    $i = 1;
+                    foreach($data['data']['result']['grafikBookingBulan'] as $rows){
+                ?>  
+                    'rgba(<?php echo rand(1,255).",".rand(1,255).",".rand(1,255); ?>, 0.2)',
+                <?php
+                    }
+                ?>
             ],
             borderColor: [
                 'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
             ],
             borderWidth: 1
         }]
@@ -435,4 +456,139 @@ var myChart = new Chart(ctx, {
         }
     }
 });
+
+function grafikMember(){
+    $.ajax({
+        url: "<?php echo site_url('Admin/Dashboard/grafikMember')?>",
+        type: "POST",
+        data: {session_grafmember:session_grafmember},
+		dataType: 'json',
+        success: function(dataa) {
+            var labelTemp = [];
+            var dataSetTemp = [];
+            var backgrounTemp = [];
+            var borderTemp = [];
+            for (i = 0; i < dataa.length; i++) {
+                var rand1 = Math.floor(Math.random() * 255);
+                var rand2 = Math.floor(Math.random() * 255);
+                var rand3 = Math.floor(Math.random() * 255);
+                labelTemp.push( dataa[i].bulan_tahun );
+                dataSetTemp.push( dataa[i].count_member );
+                backgrounTemp.push( 'rgba('+rand1+', '+rand2+', '+rand3+', 0.2)' );
+                borderTemp.push( 'rgba('+rand1+', '+rand2+', '+rand3+', 1)' );
+            }
+                // console.log(labelTemp);
+                myChart.destroy();  // call destroy before loading new dataset
+                myChart = chartUpdate(labelTemp, dataSetTemp, backgrounTemp, borderTemp);
+            if(session_grafmember == 'tahunan'){
+                document.getElementById('session_grafmember').value = 'bulanan';
+                $('#grafik_member').html('Bulanan');
+            }else{
+                document.getElementById('session_grafmember').value = 'tahunan';
+                $('#grafik_member').html('Tahunan');
+            }
+        }
+    });
+}
+
+
+
+function chartUpdate(labeldata, countdata, bgcolor, bdrcolor){
+    let ctxid = document.getElementById("myChart").getContext('2d');
+    let myChartLine = new Chart(ctxid, {
+    //chart akan ditampilkan sebagai bar chart
+        type: 'bar',
+        data: {
+        //membuat label chart
+            labels: labeldata,
+            datasets: [{
+                label: 'Grafik Member',
+                //isi chart
+                data: countdata,
+                //membuat warna pada bar chart
+                backgroundColor: bgcolor,
+                borderColor: bdrcolor,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+    return myChartLine; // return chart object
+}
+
+function grafikBooking(){
+    sessionbooking = document.getElementById('session_grafbooking').value;
+    $.ajax({
+        url: "<?php echo site_url('Admin/Dashboard/grafikBooking')?>",
+        type: "POST",
+        data: {session_grafbooking:sessionbooking},
+		dataType: 'json',
+        success: function(dataa) {
+            var labelTemp = [];
+            var dataSetTemp = [];
+            var backgrounTemp = [];
+            var borderTemp = [];
+            for (i = 0; i < dataa.length; i++) {
+                var rand1 = Math.floor(Math.random() * 255);
+                var rand2 = Math.floor(Math.random() * 255);
+                var rand3 = Math.floor(Math.random() * 255);
+                labelTemp.push( dataa[i].bulan_tahun );
+                dataSetTemp.push( dataa[i].count_booking );
+                backgrounTemp.push( 'rgba('+rand1+', '+rand2+', '+rand3+', 0.2)' );
+                borderTemp.push( 'rgba('+rand1+', '+rand2+', '+rand3+', 1)' );
+            }
+                // console.log(labelTemp);
+                bookingChart.destroy();  // call destroy before loading new dataset
+                bookingChart = chartUpdateBooking(labelTemp, dataSetTemp, backgrounTemp, borderTemp);
+            if(sessionbooking == 'tahunan'){
+                document.getElementById('session_grafbooking').value = 'bulanan';
+                $('#grafik_booking').html('Bulanan');
+            }else{
+                document.getElementById('session_grafbooking').value = 'tahunan';
+                $('#grafik_booking').html('Tahunan');
+            }
+        }
+    });
+}
+
+function chartUpdateBooking(labeldata, countdata, bgcolor, bdrcolor){
+    let ctxid = document.getElementById("myChartBooking").getContext('2d');
+    let myChartLine = new Chart(ctxid, {
+    //chart akan ditampilkan sebagai bar chart
+        type: 'line',
+        data: {
+        //membuat label chart
+            labels: labeldata,
+            datasets: [{
+                label: 'Grafik Member',
+                //isi chart
+                data: countdata,
+                //membuat warna pada bar chart
+                backgroundColor: bgcolor,
+                borderColor: bdrcolor,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+    return myChartLine; // return chart object
+}
 </script>

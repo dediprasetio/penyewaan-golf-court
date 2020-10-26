@@ -58,17 +58,74 @@ class AdminModel extends CI_Model {
 
 	public function grafikMemberBulan()
 	{
-		return $this->db->query('SELECT
-									COUNT(tm.id_member) count_member,
-									CONCAT(YEAR(tm.register_date),MONTH(tm.register_date)) yearmonth,
-									CONCAT(mt.column_2, " ", YEAR(tm.register_date)) bulan_tahun
-								FROM tbl_member tm
-								JOIN mapping_table mt ON mt.column_1 = MONTH(tm.register_date)
-								WHERE YEAR(tm.register_date) <= YEAR(CURDATE())
-								AND MONTH(tm.register_date) <= MONTH(CURDATE())
-								GROUP BY CONCAT(YEAR(tm.register_date),MONTH(tm.register_date))
-								ORDER BY YEAR(tm.register_date), MONTH(tm.register_date) ASC
-								LIMIT 12');
+		return $this->db->query('SELECT q.bulan_tahunind bulan_tahun, q.maping_tahun, q.column_1,
+									(SELECT COUNT(tm.id_member)
+										FROM tbl_member tm
+										WHERE YEAR(tm.register_date) = q.maping_tahun
+										AND MONTH(tm.register_date) = q.column_1) count_member
+								FROM(
+									SELECT
+										CASE WHEN MONTH(CURRENT_DATE()) >= mt.column_1
+												THEN CONCAT(mt.column_2, " ", YEAR(CURDATE()))
+												ELSE CONCAT(mt.column_2, " ", YEAR(CURDATE())-1)
+										END AS bulan_tahunind,
+										CASE WHEN MONTH(CURRENT_DATE()) >= mt.column_1
+												THEN YEAR(CURDATE())
+												ELSE YEAR(CURDATE())-1
+										END AS maping_tahun,
+										mt.column_1
+									FROM mapping_table mt
+									LIMIT 12
+								) q
+								ORDER BY q.maping_tahun, FLOOR(q.column_1) ASC');
+	}
+
+	public function grafikMembertahun()
+	{
+		return $this->db->query("SELECT mt.column_1 bulan_tahun,
+									(SELECT COUNT(tm.id_member)
+									FROM tbl_member tm
+									WHERE YEAR(tm.register_date) = mt.column_1) count_member
+									FROM mapping_table mt
+								WHERE mt.kd_mapping = 'MAPPING_YEAR_FS'
+									AND mt.column_1 BETWEEN YEAR(CURDATE())-10 AND YEAR(CURDATE())
+									ORDER BY mt.column_1 ASC");
+	}
+
+	public function grafikBookingBulan()
+	{
+		return $this->db->query('SELECT q.bulan_tahunind bulan_tahun, q.maping_tahun, q.column_1,
+									(SELECT COUNT(tb.id_pesanan)
+										FROM tbl_booking tb
+										WHERE YEAR(tb.tgl_booking) = q.maping_tahun
+										AND MONTH(tb.tgl_booking) = q.column_1) count_booking
+								FROM(
+									SELECT
+										CASE WHEN MONTH(CURRENT_DATE()) >= mt.column_1
+												THEN CONCAT(mt.column_2, " ", YEAR(CURDATE()))
+												ELSE CONCAT(mt.column_2, " ", YEAR(CURDATE())-1)
+										END AS bulan_tahunind,
+										CASE WHEN MONTH(CURRENT_DATE()) >= mt.column_1
+												THEN YEAR(CURDATE())
+												ELSE YEAR(CURDATE())-1
+										END AS maping_tahun,
+										mt.column_1
+									FROM mapping_table mt
+									LIMIT 12
+								) q
+								ORDER BY q.maping_tahun, FLOOR(q.column_1) ASC');
+	}
+
+	public function grafikBookingTahun()
+	{
+		return $this->db->query("SELECT mt.column_1 bulan_tahun,
+									(SELECT COUNT(tb.id_pesanan)
+										FROM tbl_booking tb
+										WHERE YEAR(tb.tgl_booking) = mt.column_1) count_booking
+								FROM mapping_table mt
+								WHERE mt.kd_mapping = 'MAPPING_YEAR_FS'
+									AND mt.column_1 BETWEEN YEAR(CURDATE())-10 AND YEAR(CURDATE())
+									ORDER BY mt.column_1 ASC");
 	}
 
 }
