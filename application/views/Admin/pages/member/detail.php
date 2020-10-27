@@ -72,6 +72,7 @@ $payment = $record['payment'];
 						<div class="pb-6">Untuk mengubah profile member, silahkan click button di bawah ini!</div>
 						<!--end::Contact-->
 						<a href="<?= site_url('Admin/Member/form/'.base64_encode($row->id_member)) ?>" class="btn btn-light-success font-weight-bold py-3 px-6 mb-2 text-center btn-block">Edit Member</a>
+						<a href="<?= site_url('Admin/Member/printcard/'.base64_encode($row->id_member)) ?>" class="btn btn-light-info font-weight-bold py-3 px-6 mb-2 text-center btn-block">Print Kartu</a>
 					</div>
 					<!--end::Body-->
 				</div>

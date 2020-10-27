@@ -51,6 +51,19 @@ class Member extends CI_Controller {
 		$this->load->view('Admin/layouts/main', $data, FALSE);
 	}
 
+	public function printcard($id='')
+	{
+		if (@$id) {
+			$i = ['id_member' => base64_decode($id)];
+			$result = $this->description("Admin Data Member Pages | Booking Golf Court", "Data Member Config", "member", $this->member->show($i)->row(), 'member');
+		}else{
+			$result = $this->description("Admin Data Member Pages | Booking Golf Court", "Data Member Config", "member", random_string('alpha',3).''.random_string('numeric', 8), 'member');
+		}
+		$data['data'] = $result;
+		$data['content'] = "Admin/pages/member/printcard";
+		$this->load->view('Admin/pages/member/printcard', $data);
+	}
+
 	public function action($id='')
 	{
 		$this->form_validation->set_rules('nama', 'Nama Member', 'trim|required', ['required' => 'You must provide a %s.']);
