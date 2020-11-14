@@ -458,6 +458,7 @@ var bookingChart = new Chart(ctx, {
 });
 
 function grafikMember(){
+        session_grafmember = document.getElementById('session_grafmember').value;
     $.ajax({
         url: "<?php echo site_url('Admin/Dashboard/grafikMember')?>",
         type: "POST",
